@@ -1,0 +1,336 @@
+.model tiny
+
+.code
+.386
+	org 100h
+
+start:
+
+nums dd ' ', '1',' ', '2', ' ', '3' 
+sub eax,eax
+sub bx,bx
+mov cx,2
+L: 
+
+mov dx,[eax]
+mov ah,2
+int 21h
+inc eax
+
+loop L
+
+mov ax, 0003h
+int 10h
+
+mov bx, 0b800h
+mov es, bx
+
+
+mov bx, 400
+mov ah, '1'
+mov al, '1'
+mov cx, 4
+
+startloop:
+add bx,1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], eax
+inc eax
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop
+
+mov bx, 560
+mov cx, 4
+
+startloop1:
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], eax
+inc eax
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop1
+mov bx, 720
+mov cx, 1
+
+add bx, 1
+mov es:[bx], 71h
+add bx,1
+mov es:[bx], eax
+inc eax
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+mov al, '1'
+mov ah, '0'
+mov cx,3
+
+startloop2:
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], ah
+inc ah
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop2
+
+mov bx, 880
+mov cx, 4
+
+startloop3:
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], ah
+inc ah
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop3
+
+mov bx, 1040
+mov cx, 3
+
+startloop4:
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], ah
+inc ah
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop4
+mov al, '2'
+mov ah, '0'
+
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], ah
+inc ah
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+mov bx, 1200
+mov cx, 3
+mov ah, '3'
+startloop5:
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+mov es:[bx], ah
+dec ah
+inc bx
+mov es:[bx], 71h
+add bx,1
+
+loop startloop5
+
+mov cx,2
+mov al, ' '
+
+startloop6:
+mov es:[bx], al
+add bx, 1
+mov es:[bx], 71h
+add bx, 1
+
+loop startloop6
+mov bx,1212
+.repeat:
+mov cx,bx
+mov ah, 00h    ;BIOS.TestKey
+    int 16h
+
+    cmp al, 27      ;if you press ESC
+je  .escape_pressed
+cmp AH, 48h     ;if you press the up arrow
+je  .up_pressed
+cmp AH, 50h     ;if you press the down arrow
+je  .down_pressed
+cmp AH, 4Bh     ;if you press the left arrow
+je  .left_pressed
+cmp AH, 4Dh     ;if you press the right arrow
+je  .right_pressed
+
+.escape_pressed:
+
+mov ax, 4c00h
+int 21h
+
+.up_pressed:
+
+je checkingboundsforup
+.up_pressed2:
+mov eax,es:[bx]
+add bx,160
+mov cx,ax
+mov eax,es:[bx]
+mov es:[bx],cx
+add bx,2
+mov es:[bx],cx
+sub bx,2
+sub bx,160
+mov es:[bx],eax
+add bx,160
+
+mov cx,2
+cmp cx,2
+je .repeat
+
+.down_pressed:
+
+je checkingboundsfordown
+.down_pressed2:
+mov eax,es:[bx]
+sub bx,160
+mov cx,ax
+mov eax,es:[bx]
+mov es:[bx],cx
+add bx,2
+mov es:[bx],cx
+sub bx,2
+add bx,160
+mov es:[bx],eax
+sub bx,160
+
+mov cx,2
+cmp cx,2
+je .repeat
+
+.left_pressed:
+
+je checkingboundsforleft
+
+.left_pressed2:
+
+mov eax,es:[bx]
+add bx,4
+mov cx,ax
+mov eax,es:[bx]
+mov es:[bx],cx
+add bx,2
+mov es:[bx],cx
+sub bx,2
+sub bx,4
+mov es:[bx],eax
+add bx,4
+
+mov cx,2
+cmp cx,2
+je .repeat
+
+.right_pressed:
+
+
+je checkingboundsforright
+
+.right_pressed2:
+
+mov eax,es:[bx]
+sub bx,4
+mov cx,ax
+mov eax,es:[bx]
+mov es:[bx],cx
+add bx,2
+mov es:[bx],cx
+sub bx,2
+add bx,4
+mov es:[bx],eax
+sub bx,4
+
+mov cx,2
+cmp cx,2
+je .repeat
+
+
+checkingboundsfordown:
+
+cmp bx,400
+je .repeat
+cmp bx,404
+je .repeat
+cmp bx,408
+je .repeat
+cmp bx,412
+je .repeat
+
+mov dx,2
+cmp dx,2
+je .down_pressed2
+
+checkingboundsforup:
+
+cmp bx,1200
+je .repeat
+cmp bx,1204
+je .repeat
+cmp bx,1208
+je .repeat
+cmp bx,1212
+je .repeat
+
+mov dx,2
+cmp dx,2
+je .up_pressed2
+
+checkingboundsforleft:
+
+cmp bx,412
+je .repeat
+cmp bx,572
+je .repeat
+cmp bx,732
+je .repeat
+cmp bx,892
+je .repeat
+cmp bx,1052
+je .repeat
+cmp bx,1212
+je .repeat
+
+mov dx,2
+cmp dx,2
+je .left_pressed2
+
+checkingboundsforright:
+
+cmp bx,400
+je .repeat
+cmp bx,560
+je .repeat
+cmp bx,720
+je .repeat
+cmp bx,880
+je .repeat
+cmp bx,1040
+je .repeat
+cmp bx,1200
+je .repeat
+
+mov dx,2
+cmp dx,2
+je .right_pressed2
+
+
+end start
